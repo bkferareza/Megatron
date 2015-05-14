@@ -1,0 +1,16 @@
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\EMS.Common.dll.config
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\EMS.Common.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\EMS.Common.pdb
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Configuration.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Interception.Configuration.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Interception.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.xml
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Configuration.xml
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Interception.xml
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.Interception.Configuration.xml
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\obj\Debug\EMS.Common.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\obj\Debug\EMS.Common.pdb
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.RegistrationByConvention.dll
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\bin\Debug\Microsoft.Practices.Unity.RegistrationByConvention.xml
+C:\Projects\EMS Local\Source\Dev\EMS\EMS.Common\obj\Debug\EMS.Common.csprojResolveAssemblyReference.cache
