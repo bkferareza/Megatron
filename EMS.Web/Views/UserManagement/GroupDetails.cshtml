@@ -1,0 +1,200 @@
+﻿@{
+    Layout = null;
+}
+
+@using EMS.Model
+@using EMS.Model.Security
+@model EMS.Web.Model.GroupViewData
+@functions {
+    IDictionary<string, object> GetCategoryAttribute(string action, bool disabled)
+    {
+        var properties = new Dictionary<string, object> { { "class", "role-select" }, { "data-action", action } };
+
+        if (disabled || Model.IsSystemAdminGroup)
+        {
+            properties.Add("disabled", "disabled");
+        }
+
+        return properties;
+    }
+    IDictionary<string, object> GetActionAttribute(string action, UniqueObject role)
+    {
+        var properties = new Dictionary<string, object> { { "class", "role-select" }, { "data-action", action } };
+
+        if (role == null || Model.IsSystemAdminGroup)
+        {
+            properties.Add("disabled", "disabled");
+        }
+        else
+        {
+            properties.Add("data-roleID", role.ID);
+        }
+
+        return properties;
+    }
+    bool IsRoleChecked(IEnumerable<Role> roles, Role action)
+    {
+        if (action == null)
+        {
+            return false;
+        }
+
+        return roles.Any(r => r.ID == action.ID);
+    }
+}
+
+<link href="~/Content/CSS/group.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-5">
+            <div id="group-details" data-id="@Model.Group.ID" data-user-id="@Model.UserID">
+                <div class="user-title">
+                    <span class="title">User Group Management</span>
+                </div>
+                <div id="group-fields">
+                    <div>
+                        <div id="user-name">
+                            @if (string.IsNullOrWhiteSpace(Model.Group.Name))
+                            {
+                                <span class="subtitle"><span>Group</span> - <span id="title-group-name">New Group</span></span>
+                            }
+                            else
+                            {
+                                if (Model.Group.Name.Length > 35)
+                                {
+                                    <span class="subtitle"><span>Group</span> - <span id="title-group-name">@Model.Group.Name.Substring(0, 35)...</span></span>
+                                }
+                                else
+                                {
+                                    <span class="subtitle"><span>Group</span> - <span id="title-group-name">@Model.Group.Name</span></span>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <form id="group-form" action="/user-manangment/save-group" method="post">
+                        <div class="group-field">
+                            <label class="group-label">Name*:</label><br />
+                            <input id="Name" type="text" class="textbox required" value="@Model.Group.Name" name="Name" data-validation-message="Name is a required field" @Html.Raw(Model.CanModify ? "" : "disabled") />
+                        </div>
+                        <div class="group-field">
+                            <label class="group-label">Description:</label><br />
+                            <textarea id="Description" class="textarea" name="Description" maxlength="500" @Html.Raw(Model.CanModify ? "" : "disabled")>@Model.Group.Description</textarea>
+                        </div>
+                    </form>
+                </div>
+                <div id="buttons-container">
+                    <div id="action-buttons-container" class="btn-group">
+                        <input id="add-user-group" type="button" class="btn btn-primary btn-default" value="Add Group" @Html.Raw(Model.CanCreate ? "" : "disabled") />
+                        <input id="delete-group" type="button" class="btn btn-primary btn-default" value="Delete Group" data-has-users="@Model.HasUsers" @Html.Raw((Model.CanDelete && !@Model.HasUsers && !Model.IsSystemAdminGroup) ? "" : "disabled") />
+                        <input id="cancel-group" type="button" class="btn btn-primary btn-default" value="Cancel" />
+                        <input id="save-group" type="button" class="btn btn-primary btn-default" value="Save Changes" disabled="disabled" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div id="group-access-container">
+                <div class="user-title">
+                    <div style="float: right; margin-right: 20px;" class="title">
+                        <span class="subtitle" style="font-size: 11px;">(E)xecute</span>
+                        <span class="subtitle" style="font-size: 11px;">(V)iew</span>
+                        <span class="subtitle" style="font-size: 11px;">(M)odify</span>
+                        <span class="subtitle" style="font-size: 11px;">(C)reate</span>
+                        <span class="subtitle" style="font-size: 11px;">(D)elete</span>
+                    </div>
+                </div>
+                <div id="group-access-wrapper">
+                    <ul id="group-access-tree">
+                        <li>
+                            <div>
+                                <span><span style="display: inline-block; width: 20px; padding-left: 0px;"></span>Permissions</span>
+                                <span>E</span>
+                                <span>V</span>
+                                <span>M</span>
+                                <span>C</span>
+                                <span>D</span>
+                            </div>
+                        </li>
+                        @foreach (var roleCategory in Model.RoleCategories.Where(r => r.ParentRoleCategoryID == null))
+                        {
+                            <li>
+                                <div>
+                                    <span>
+                                        <span style="display: inline-block; width: 20px; padding-left: 0px;"></span>
+                                        <img src="~/Content/Images/tree-arrow-collasped.png" />@roleCategory.Name
+                                    </span>
+                                    @{
+                            var executeChildrenCount = roleCategory.ChildRoleCategories.Sum(rc => rc.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Execute));
+                            var viewChildrenCount = roleCategory.ChildRoleCategories.Sum(rc => rc.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.View));
+                            var modifyChildrenCount = roleCategory.ChildRoleCategories.Sum(rc => rc.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Modify));
+                            var createChildrenCount = roleCategory.ChildRoleCategories.Sum(rc => rc.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Create));
+                            var deleteChildrenCount = roleCategory.ChildRoleCategories.Sum(rc => rc.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Delete));
+
+                            var executeChecked = executeChildrenCount > 0 && executeChildrenCount == Model.Group.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Execute && r.RoleCategory.ParentRoleCategory.ID == roleCategory.ID);
+                            var viewChecked = viewChildrenCount > 0 && viewChildrenCount == Model.Group.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.View && r.RoleCategory.ParentRoleCategory.ID == roleCategory.ID);
+                            var modifyChecked = modifyChildrenCount > 0 && modifyChildrenCount == Model.Group.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Modify && r.RoleCategory.ParentRoleCategory.ID == roleCategory.ID);
+                            var createChecked = createChildrenCount > 0 && createChildrenCount == Model.Group.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Create && r.RoleCategory.ParentRoleCategory.ID == roleCategory.ID);
+                            var deleteChecked = deleteChildrenCount > 0 && deleteChildrenCount == Model.Group.Roles.Count(r => r.Action == EMS.Model.Security.RoleAction.Delete && r.RoleCategory.ParentRoleCategory.ID == roleCategory.ID);
+                                    }
+                                    <span @Html.Raw(executeChecked ? "class='selected'" : "")>@Html.CheckBox("role-category", executeChecked, GetCategoryAttribute("execute", executeChildrenCount == 0))</span>
+                                    <span @Html.Raw(viewChecked ? "class='selected'" : "")>@Html.CheckBox("role-category", viewChecked, GetCategoryAttribute("view", viewChildrenCount == 0))</span>
+                                    <span @Html.Raw(modifyChecked ? "class='selected'" : "")>@Html.CheckBox("role-category", modifyChecked, GetCategoryAttribute("modify", modifyChildrenCount == 0))</span>
+                                    <span @Html.Raw(createChecked ? "class='selected'" : "")>@Html.CheckBox("role-category", createChecked, GetCategoryAttribute("create", createChildrenCount == 0))</span>
+                                    <span @Html.Raw(deleteChecked ? "class='selected'" : "")>@Html.CheckBox("role-category", deleteChecked, GetCategoryAttribute("delete", deleteChildrenCount == 0))</span>
+                                </div>
+                                <div>
+                                    <ul>
+                                        @{
+                            var category = roleCategory;
+                                        }
+                                        @foreach (var childRoleCategory in Model.RoleCategories.Where(rc => rc.ParentRoleCategoryID == category.ID))
+                                        {
+                                            <li>
+                                                <div>
+                                                    <span><span style="display: inline-block; width: 37px; padding-left: 0px;"></span>@childRoleCategory.Name</span>
+                                                    @{
+                                            var executeRole = childRoleCategory.Roles.FirstOrDefault(r => r.Action == EMS.Model.Security.RoleAction.Execute);
+                                            var viewRole = childRoleCategory.Roles.FirstOrDefault(r => r.Action == EMS.Model.Security.RoleAction.View);
+                                            var modifyRole = childRoleCategory.Roles.FirstOrDefault(r => r.Action == EMS.Model.Security.RoleAction.Modify);
+                                            var createRole = childRoleCategory.Roles.FirstOrDefault(r => r.Action == EMS.Model.Security.RoleAction.Create);
+                                            var deleteRole = childRoleCategory.Roles.FirstOrDefault(r => r.Action == EMS.Model.Security.RoleAction.Delete);
+
+                                            var hasExecuteRole = IsRoleChecked(Model.Group.Roles, executeRole);
+                                            var hasViewRole = IsRoleChecked(Model.Group.Roles, viewRole);
+                                            var hasModifyRole = IsRoleChecked(Model.Group.Roles, modifyRole);
+                                            var hasCreateRole = IsRoleChecked(Model.Group.Roles, createRole);
+                                            var hasDeleteRole = IsRoleChecked(Model.Group.Roles, deleteRole);
+                                                    }
+                                                    <span @Html.Raw(hasExecuteRole ? "class='selected'" : "")>@Html.CheckBox("role", hasExecuteRole, GetActionAttribute("execute", executeRole))</span>
+                                                    <span @Html.Raw(hasViewRole ? "class='selected'" : "")>@Html.CheckBox("role", hasViewRole, GetActionAttribute("view", viewRole))</span>
+                                                    <span @Html.Raw(hasModifyRole ? "class='selected'" : "")>@Html.CheckBox("role", hasModifyRole, GetActionAttribute("modify", modifyRole))</span>
+                                                    <span @Html.Raw(hasCreateRole ? "class='selected'" : "")>@Html.CheckBox("role", hasCreateRole, GetActionAttribute("create", createRole))</span>
+                                                    <span @Html.Raw(hasDeleteRole ? "class='selected'" : "")>@Html.CheckBox("role", hasDeleteRole, GetActionAttribute("delete", deleteRole))</span>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div id="delete-group-confirm" tabindex="-1" role="dialog" class="modal fade ng-isolate-scope in" style="z-index: 1050; display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content" modal-transclude="">
+            <div class="modal-body">Are you sure you want to delete @Model.Group.Name?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-naitsirch-confirm pull-right" id="delete-group-ok">OK</button>
+                <button type="button" class="btn btn-default btn-naitsirch-cancel pull-right" id="delete-group-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

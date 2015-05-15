@@ -1,0 +1,13 @@
+﻿#left-panel {
+    border-right-color: #e7e7e7;
+    border-right-width: 1px;
+    border-right-style: solid;
+    overflow-y: auto;
+}
+
+#right-panel {
+    border-left-color: #e7e7e7;
+    border-left-width: 1px;
+    border-left-style: solid;
+    overflow-y: auto;
+}

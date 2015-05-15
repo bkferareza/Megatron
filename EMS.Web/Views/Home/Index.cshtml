@@ -1,0 +1,111 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html data-ng-app="EMSApp">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+ 
+    <title data-ng-bind="page.title"></title>
+    <style>
+        input {
+            vertical-align: middle;
+            display: table-cell;
+        }
+
+        div {
+            line-height: 30px;
+        }
+
+        .form {
+            border: 1px solid grey;
+        }
+    </style>
+
+
+</head>
+<body>
+   
+
+        <div class="col-lg-12" ng-view>
+
+        </div>
+
+    @using System.Web.Optimization
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/angularjs")
+    @Styles.Render("~/Content/css")
+    <link href="~/Content/toastr.css" rel="stylesheet" />
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-bottom-right",
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "preventDuplicates": true,
+                "hideMethod": "fadeOut"
+            };
+        });
+    </script>
+
+    <script src="~/Scripts/AngularExtensions/Spectrum/spectrum.js"></script>
+    <link href="~/Scripts/AngularExtensions/Spectrum/spectrum.css" rel="stylesheet" />
+    <script src="~/Scripts/AngularExtensions/DateJs/date.js"></script>
+    <script src="~/Scripts/angular-animate.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularUI/ui-bootstrap.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularUI/ui-bootstrap-tpls.js"></script> 
+    <script src="~/Scripts/AngularExtensions/Carousel/js/bootstrap-modal-carousel.js"></script>
+    <link href="~/Scripts/AngularExtensions/Carousel/css/bootstrap-modal-carousel.css" rel="stylesheet" />
+    <script src="~/Scripts/AngularExtensions/AngularTree/angular-ui-tree.min.js"></script>
+    <link href="~/Scripts/AngularExtensions/AngularTree/angular-ui-tree.min.css" rel="stylesheet" />
+    <script src="~/Scripts/AngularExtensions/AngularUpload/angular-file-upload-all.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularUpload/angular-file-upload-shim.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularUpload/angular-file-upload.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularTimer/timer.js"></script>
+    <script src="~/Scripts/AngularExtensions/AngularFilter/angular-filter.js"></script>
+    <script src="~/Client/app.js"></script>
+    <script src="~/Client/AuditTrail/audittrail-services.js"></script>
+    <script src="~/Client/Users/users-modules.js"></script>
+    <script src="~/Client/Users/users-ctrl.js"></script>
+    <script src="~/Client/Users/users-services.js"></script>
+    <script src="~/Client/Discussions/discussions-services.js"></script>
+    <script src="~/Client/Dashboard/dashboard-module.js"></script>
+    <script src="~/Client/Dashboard/dashboard-ctrl.js"></script>
+    <script src="~/Client/Dashboard/dashboard-services.js"></script>
+    <script src="~/Client/Charts/chart-module.js"></script>
+    <script src="~/Client/Charts/charts-ctrl.js"></script>
+    <script src="~/Client/Charts/chart-services.js"></script>
+    <script src="~/Client/DataPoints/datapoints-module.js"></script>
+    <script src="~/Client/DataPoints/datapoints-ctrl.js"></script>
+    <script src="~/Client/DataPoints/datapoints-services.js"></script>
+    <script src="~/Client/Misc/misc-services.js"></script>
+    <script src="~/Client/Templates/templates-modules.js"></script>
+    <script src="~/Client/Templates/templates-ctrl.js"></script>
+    <script src="~/Client/Templates/templates-services.js"></script>
+    
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/smart-table.min.js"></script>
+    <script type="text/javascript" src="~/Content/JS/group.js"></script>
+    <link href="~/Content/CSS/main.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/Content/JS/common.js"></script>
+    <script type="text/javascript" src="~/Scripts/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="~/Scripts/amcharts/serial.js"></script>
+    <script type="text/javascript" src="~/Scripts/amcharts/pie.js"></script>
+    <script type="text/javascript" src="~/Scripts/amcharts/themes/none.js"></script>
+    <script type="text/javascript" src="~/Scripts/amcharts/plugins/export/export.min.js"></script>
+    <link type="text/css" href="~/Scripts/amcharts/plugins/export/export.css" rel="stylesheet">
+</body>
+</html>

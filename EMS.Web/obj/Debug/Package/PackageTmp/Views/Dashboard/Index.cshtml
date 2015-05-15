@@ -1,0 +1,398 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/CSS/chart.css" rel="stylesheet" />
+
+<script type="text/ng-template" id="variableTree_renderer_template_management.html">
+    <div ui-tree-handle ng-class="{ 'select': $treeScope.multiSelect, 'copy': $treeScope.copy }" class="treeNode" style="min-width:1000px">
+        <a class="btn btn-success btn-xs" nodrag ng-click="toggle(this)">
+            <span ng-show="showToggle(this)" class="glyphicon" ng-class="{ 'glyphicon glyphicon-folder-close': collapsed, 'glyphicon glyphicon-folder-open': !collapsed }"></span>
+            <span ng-show="!showToggle(this)" class="glyphicon glyphicon-stop"></span>
+        </a>
+        <span ng-if="item.Type == 2">
+            [DP]
+        </span>
+        <span ng-if="item.Type == 1">
+            [F]
+        </span>
+        <label class="userTree" ng-click="modifyDataPoint(item,chart.DataPoints)">
+            {{item.FriendlyName}}
+        </label>
+    </div>
+    <ol ui-tree-nodes ng-model="item.ChildVariables" ng-class="{ 'hidden': collapsed }">
+        <li ng-repeat="item in item.ChildVariables"
+            ui-tree-node ng-class="{ 'selected': selected, 'original': original }"
+            ng-include="'variableTree_renderer_template_management.html'" style="min-width: 50px;"></li>
+    </ol>
+</script>
+<div class="row-fluid" style="overflow-y:auto;z-index:-999;">
+
+
+    <div class="row-fluid" ng-show="showDashboard" ng-repeat="chart in Charts">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{chart.Name}}</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul id="charttabul" ng-init="tab = 1">
+                            <li id="charttabli1" ng-class="{active:tab===1}">
+                                <a href ng-click="tab = 1">Chart</a>
+                            </li>
+                            <li id="charttabli2" ng-class="{active:tab===2}">
+                                <a href ng-click="tab = 2">Grid</a>
+                            </li>
+                            <div id="{{chart.chartdiv}}" ng-show="tab === 1" style="border-radius: 5px; border: solid 1px rgb(198, 198, 198); background-color: rgb(248,248,248); width: 100%; height: 450px;"></div>
+                            <div id="griddivdashboard" ng-show="tab === 2">
+                                <table st-table="chartData" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th ng-repeat="column in chart.chartDataColumn" st-sort="{{column}}">{{column}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in chart.chartData">
+                                            <td ng-repeat="column in chart.chartDataColumn">{{row[column]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <ul id="chartdetails" ng-init="tab2 = 2">
+                                    <li id="chartdatali1" ng-class="{active:tab2===1}">
+                                        <a href="" ng-click="tab2 = 1">Chart Details</a>
+                                    </li>
+                                    <li id="chartdatali2" ng-class="{active:tab2===2}">
+                                        <a href="" ng-click="tab2 = 2">Datapoints</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div id="griddiv2" ng-show="tab2 === 1">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading"><label>Chart Details</label> </div>
+                                        <div class="panel-body">
+                                            <p>Range Type: {{rangeType[chart.RangeType-1].Name}}</p>
+                                            <p>Query Mode: {{queryModes[chart.QueryMode - 1].Name}}</p>
+                                            <p>Log Interval: {{logIntervals[chart.Interval-1].Name}}</p>
+                                            <p>Chart Type: {{chartTypes[chart.ChartType-1].Name}}</p>
+                                            <p>Aggregate Option Normal: {{aggregateOptions[chart.AggregateOptionNormal - 1].Name}}</p>
+                                            <p>Aggregate Option Faulty: {{aggregateOptions[chart.AggregateOptionFaulty - 1].Name}}</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="griddiv2" ng-show="tab2 === 2">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading"><label>Chart Datapoints</label></div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h4>Datapoints</h4>
+                                                    <div align="left"
+                                                         style="overflow: scroll; height: 200px; overflow-y: auto;">
+                                                        <ui-tree callbacks="callbacks"
+                                                                 drag-enabled="parameters.dragEnabled"
+                                                                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                                                 max-depth="parameters.maxDepth"
+                                                                 drag-delay="parameters.dragDelay"
+                                                                 drag-distance="parameters.dragDistance"
+                                                                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                                                 bound-to="parameters.boundTo"
+                                                                 spacing="parameters.spacing"
+                                                                 coverage="parameters.coverage"
+                                                                 cancel-key="parameters.cancelKey"
+                                                                 copy-key="parameters.copyKey"
+                                                                 select-key="parameters.selectKey"
+                                                                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                                            <ol ui-tree-nodes ng-model="variableTree[0]">
+                                                                <li ng-repeat="item in variableTree[0]" ui-tree-node
+                                                                    ng-class="{ 'selected': selected, 'original': original }"
+                                                                    ng-include="'variableTree_renderer_template_management.html'"></li>
+                                                            </ol>
+                                                        </ui-tree>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h4>Selected Datapoints</h4>
+                                                    <div align="left"
+                                                         style="overflow: scroll; height: 200px; overflow-y: auto;">
+                                                        <ui-tree callbacks="callbacks"
+                                                                 drag-enabled="parameters.dragEnabled"
+                                                                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                                                 max-depth="parameters.maxDepth"
+                                                                 drag-delay="parameters.dragDelay"
+                                                                 drag-distance="parameters.dragDistance"
+                                                                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                                                 bound-to="parameters.boundTo"
+                                                                 spacing="parameters.spacing"
+                                                                 coverage="parameters.coverage"
+                                                                 cancel-key="parameters.cancelKey"
+                                                                 copy-key="parameters.copyKey"
+                                                                 select-key="parameters.selectKey"
+                                                                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                                            <ol ui-tree-nodes
+                                                                ng-model="chart.DataPoints">
+                                                                <li ng-repeat="item in chart.DataPoints" ui-tree-node
+                                                                    ng-class="{ 'selected': selected, 'original': original }"
+                                                                    ng-include="'variableTree_renderer_template_management.html'"></li>
+                                                            </ol>
+                                                        </ui-tree>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <a class="btn btn-info form-control" data-toggle="modal" data-target="#{{chart.ChartModal}}">Discussion Board</a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a class="btn btn-success form-control" ng-click="regenerateChart(chart)">Generate Chart</a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        @*<a class="btn btn-primary form-control" ng-click="">Save Chart</a>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal fade" id={{chart.ChartModal}} tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Discussion Board for {{chart.Name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h5 class="panel-title">Comment for {{chart.Name}}</h5>
+                            </div>
+                            <div class="panel-body">
+                                <textarea type="text" class="form-control" ng-model=chart.Message></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-primary" ng-click="createDiscussion(chart.Message,chart)">Submit</button>
+                        <button type="button" class="btn btn-default btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row-fluid" ng-hide="showDashboard" ng-repeat="chart in discussionCharts">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{chart.Name}} (From {{chart.Author}}'s Template) <label class="pull-right">Discussion</label></h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul id="charttabul" ng-init="tab = 1">
+                            <li id="charttabli1" ng-class="{active:tab===1}">
+                                <a href ng-click="tab = 1">Chart</a>
+                            </li>
+                            <li id="charttabli2" ng-class="{active:tab===2}">
+                                <a href ng-click="tab = 2">Grid</a>
+                            </li>
+                            <div id="{{chart.chartdiv}}" ng-show="tab === 1" style="border-radius: 5px; border: solid 1px rgb(198, 198, 198); background-color: rgb(248,248,248); width: 100%; height: 450px;"></div>
+                            <div id="griddivdashboard" ng-show="tab === 2">
+                                <table st-table="chartData" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th ng-repeat="column in chart.chartDataColumn" st-sort="{{column}}">{{column}}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="row in chart.chartData">
+                                            <td ng-repeat="column in chart.chartDataColumn">{{row[column]}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <ul id="chartdetails" ng-init="tab2 = 3">
+                                    <li id="chartdatali1" ng-class="{active:tab2===1}">
+                                        <a href="" ng-click="tab2 = 1">Chart Details</a>
+                                    </li>
+                                    <li id="chartdatali2" ng-class="{active:tab2===2}">
+                                        <a href="" ng-click="tab2 = 2">Datapoints</a>
+                                    </li>
+                                    <li id="chartdatali2" ng-class="{active:tab2===3}">
+                                        <a href="" ng-click="tab2 = 3">Discussions</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div id="griddiv2" ng-show="tab2 === 1">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading"><label>Chart Details</label> </div>
+                                        <div class="panel-body">
+                                            <p>Range Type: {{rangeType[chart.RangeType-1].Name}}</p>
+                                            <p>Query Mode: {{queryModes[chart.QueryMode - 1].Name}}</p>
+                                            <p>Log Interval: {{logIntervals[chart.Interval-1].Name}}</p>
+                                            <p>Chart Type: {{chartTypes[chart.ChartType-1].Name}}</p>
+                                            <p>Aggregate Option Normal: {{aggregateOptions[chart.AggregateOptionNormal - 1].Name}}</p>
+                                            <p>Aggregate Option Faulty: {{aggregateOptions[chart.AggregateOptionFaulty - 1].Name}}</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="griddiv2" ng-show="tab2 === 2">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading"><label>Chart Datapoints</label></div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h4>Datapoints</h4>
+                                                    <div align="left"
+                                                         style="overflow: scroll; height: 200px; overflow-y: auto;">
+                                                        <ui-tree callbacks="callbacks"
+                                                                 drag-enabled="parameters.dragEnabled"
+                                                                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                                                 max-depth="parameters.maxDepth"
+                                                                 drag-delay="parameters.dragDelay"
+                                                                 drag-distance="parameters.dragDistance"
+                                                                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                                                 bound-to="parameters.boundTo"
+                                                                 spacing="parameters.spacing"
+                                                                 coverage="parameters.coverage"
+                                                                 cancel-key="parameters.cancelKey"
+                                                                 copy-key="parameters.copyKey"
+                                                                 select-key="parameters.selectKey"
+                                                                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                                            <ol ui-tree-nodes ng-model="variableTree[0]">
+                                                                <li ng-repeat="item in variableTree[0]" ui-tree-node
+                                                                    ng-class="{ 'selected': selected, 'original': original }"
+                                                                    ng-include="'variableTree_renderer_template_management.html'"></li>
+                                                            </ol>
+                                                        </ui-tree>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h4>Selected Datapoints</h4>
+                                                    <div align="left"
+                                                         style="overflow: scroll; height: 200px; overflow-y: auto;">
+                                                        <ui-tree callbacks="callbacks"
+                                                                 drag-enabled="parameters.dragEnabled"
+                                                                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                                                 max-depth="parameters.maxDepth"
+                                                                 drag-delay="parameters.dragDelay"
+                                                                 drag-distance="parameters.dragDistance"
+                                                                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                                                 bound-to="parameters.boundTo"
+                                                                 spacing="parameters.spacing"
+                                                                 coverage="parameters.coverage"
+                                                                 cancel-key="parameters.cancelKey"
+                                                                 copy-key="parameters.copyKey"
+                                                                 select-key="parameters.selectKey"
+                                                                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                                            <ol ui-tree-nodes
+                                                                ng-model="chart.DataPoints">
+                                                                <li ng-repeat="item in chart.DataPoints" ui-tree-node
+                                                                    ng-class="{ 'selected': selected, 'original': original }"
+                                                                    ng-include="'variableTree_renderer_template_management.html'"></li>
+                                                            </ol>
+                                                        </ui-tree>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="griddiv3" ng-show="tab2 === 3">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h4>Discussion</h4>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row" style="overflow-y:auto;height:300px;">
+                                                <div class="panel panel-info" ng-repeat="message in chart.DiscussionBoard.DiscussionMessages">
+                                                    <div class="panel-heading">
+                                                        {{message.Author}}<label class="pull-right">{{message.DateModified}}</label>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <p>{{message.Message}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <a class="btn btn-info form-control" data-toggle="modal" data-target="#{{chart.ChartModal}}">Reply to Dashboard</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="modal fade" id={{chart.ChartModal}} tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Discussion for {{chart.Name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <h5 class="panel-title">Reply for {{chart.Name}}</h5>
+                            </div>
+                            <div class="panel-body">
+                                <textarea type="text" class="form-control" ng-model=chart.Message></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-primary" ng-click="sendReply(chart.DiscussionBoard.ID,chart.Message,chart)">Submit</button>
+                        <button type="button" class="btn btn-default btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<button class="btn btn-info pull-left"
+        style="position: fixed; top: 712px; left: 0px; z-index:1000"
+        type="button" ng-click="togglePage()">
+    <span class="glyphicon glyphicon-list-alt"></span>
+</button>

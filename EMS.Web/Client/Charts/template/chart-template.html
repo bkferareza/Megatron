@@ -1,0 +1,249 @@
+﻿<div class="ng-modal-overlay">
+     <div class="modal-contentB">
+            <div class="modal-header">
+                <h3>
+                    Chart Wizard
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div id="myCarousel"
+                     class="carousel slide carousel-fit"
+                     data-ride="carousel"
+                     data-interval="false">
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner row-fluid">
+                        <!-- Data points -->
+                        <div class="item active">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+                                        <h4>
+                                            Select Data Points
+                                        </h4>
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <label for="Data Point">Data Points: </label>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-md-12">
+                                    Variable Tree will be placed here
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <footer>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-primary pull-left" href="#myCarousel" data-slide="prev">
+                                            Back
+                                        </a>
+                                        <a class="btn btn-default btn-primary pull-right" href="#myCarousel" data-slide="next">
+                                            Next
+                                        </a>
+                                    </div>
+
+                                </footer>
+                            </div>
+                        </div>
+                        <!-- Ranges -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+                                        <h4>
+                                            Time Range
+                                        </h4>
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <label for="RangeType">Range Type: </label>
+                                <input type="radio" id="rangeType" value='Fixed' ng-model="chart.RangeType" title="Fixed" /> Fixed
+                                <input type="radio" id="rangeType" value='Repeated' ng-model="chart.RangeType" title="Repeated" /> Repeated
+                            </div>
+                            <!-- Fixed Time Range -->
+                            <div class="row" ng-show="chart.RangeType == 'Fixed'">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        From:  <input ng-model="chart.RangeFrom" class="form-control" name="DateRangeFrom" type="datetime-local" ng-disabled="panel" />
+                                        To:  <input ng-model="chart.RangeTo" class="form-control" name="DateRangeTo" type="datetime-local" ng-disabled="panel" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    &nbsp;
+                                </div>
+                            </div>
+                            <!-- Repeated Time Range -->
+                            <div class="row" ng-show="chart.RangeType == 'Repeated'">
+                                <div class="row">
+                                    Days:
+                                </div>
+                                <div class="row" style="padding:5px; margin:5px;">
+                                    <div class="col-md-12">
+                                        <div ng-style="dayStyle"
+                                             ng-repeat="day in days"
+                                             ng-class="day.Checked? dayStyle={'background-color':'lightgreen'}:dayStyle={'background-color':'white'}"
+                                             ng-click="toggleDay(day)"
+                                             class="days col-xs-1 text-center"
+                                             ng-show="weeklyInterval">
+                                            {{day.Tag}}
+                                        </div>
+                                        <div ng-repeat="day in days"
+                                             class="daysInactive col-xs-1 text-center"
+                                             ng-hide="weeklyInterval">
+                                            {{day.Tag}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <footer>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-primary pull-left" href="#myCarousel" data-slide="prev">
+                                            Back
+                                        </a>
+                                        <a class="btn btn-default btn-primary pull-right" href="#myCarousel" data-slide="next">
+                                            Next
+                                        </a>
+                                    </div>
+
+                                </footer>
+                            </div>
+                        </div>
+                        <!-- Log Interval -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+                                        <h4>
+                                            Select Log Interval
+                                        </h4>
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row" style="padding:5px;margin:5px">
+                                <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                    <label for="Interval">Log Interval: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="Interval" ng-model="chart.Interval"
+                                                    ng-options="logInterval.Name for logInterval in logIntervals" ng-disabled="panel" required>
+                                                <option value="">Select Interval: </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.Interval.$error.required && chartInfo.Interval.$dirty">
+                                                *  Interval Required
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <footer>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-primary pull-left" href="#myCarousel" data-slide="prev">
+                                            Back
+                                        </a>
+                                        <a class="btn btn-default btn-primary pull-right" href="#myCarousel" data-slide="next">
+                                            Next
+                                        </a>
+                                    </div>
+
+                                </footer>
+                            </div>
+                        </div>
+                        <!-- Chart Properties -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+                                        <h4>
+                                            Chart Properties
+                                        </h4>
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                    <label for="QueryMode"> Query Mode: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="QueryMode" ng-model="chart.QueryMode"
+                                                    ng-options="querymode.Name for querymode in queryModes" ng-disabled="panel" required>
+                                                <option value="">Select Query Mode</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.QueryMode.$error.required && chartInfo.QueryMode.$dirty">
+                                                *  QueryMode Required
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                    <label for="ChartType"> Chart Type: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="ChartType" ng-model="chart.ChartType"
+                                                    ng-options="chartype.Name for chartype in chartTypes" ng-disabled="panel" required>
+                                                <option value="">Select Chart Type </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.ChartType.$error.required && chartInfo.ChartType.$dirty">
+                                                *  ChartType Required
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <footer>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-primary pull-left" href="#myCarousel" data-slide="prev">
+                                            Back
+                                        </a>
+                                        <a class="btn btn-default btn-primary pull-right" href="#myCarousel" data-slide="next">
+                                            Next
+                                        </a>
+                                    </div>
+
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <a class="btn btn-default btn-primary">
+                    Close
+                </a>
+                <a class="btn btn-default" ng-click="">
+                    Save
+                </a>
+            </div>
+        </div>
+    </div>

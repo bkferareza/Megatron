@@ -1,0 +1,247 @@
+﻿body
+{
+    overflow-x: hidden;
+}
+
+.form-horizontal {
+    /* text-align:right; */
+    text-align: left;
+}
+
+.btn-margin-left {
+    margin-left: 75px;
+}
+
+.btn-margin-right {
+    margin-right: 75px;
+}
+
+.ng-modal-overlay {
+    /* A dark translucent div that covers the whole screen */
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0,0.8);
+
+}
+
+.ng-modal-dialog {
+    /* A centered div above the overlay with a box shadow. */
+    z-index: 10000;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 0; /* Default */
+    /*Center the dialog*/
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+}
+
+.ng-modal-dialog-content {
+    padding: 10px;
+    text-align: left;
+    height: 100%;
+    border-radius: 0;
+}
+
+.ng-modal-close {
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 120%;
+    display: inline-block;
+    font-weight: bold;
+    font-family: 'arial', 'sans-serif';
+}
+
+form .ng-dirty.ng-invalid-required {
+    background: pink;
+    color: black;
+}
+
+form .ng-dirty.ng-invalid-url {
+    background: pink;
+    color: black;
+}
+
+form .ng-dirty.ng-invalid-date {
+    background: pink;
+    color: black;
+}
+
+form .ng-dirty.ng-valid-required {
+    background: green;
+    color: white;
+}
+
+div.error {
+    color: red;
+    font-weight: bold;
+}
+
+.navbar-nav {
+    width: 100%;
+    text-align: center;
+}
+
+li:hover {
+    cursor: pointer;
+}
+
+.userTree:hover {
+    cursor: pointer;
+    color: skyblue;
+}
+
+.error {
+    color: red;
+}
+
+.modal-content {
+    position: relative;
+    top: 150px;
+}
+
+.modal-body{
+    padding:25px;
+}
+.modal-contentA {
+    /* A centered div above the overlay with a box shadow. */
+    background-color: white;
+    border-radius:10px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    position: absolute;
+    top: 25%;
+    left: 35%;
+    opacity:1;
+}
+
+.modal-contentB {
+    /* A centered div above the overlay with a box shadow. */
+    background-color: white;
+    border-radius:10px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+    background-clip: padding-box;
+    position: absolute;
+    top: 5%;
+    left: 25%;
+    opacity: 1;
+    width: 50%;
+}
+
+.preview {
+    height:150px; 
+    width: 150px; 
+    border: 1px black solid;
+}
+
+#days
+{
+    border-top: 2px black solid;
+    border-right: 2px black solid;
+    border-left:2px black solid;
+    border-bottom: 2px black solid;
+    text-align:center;
+}
+#days:hover
+{
+    cursor: pointer;
+    background-color: greenyellow;
+}
+
+.daysInactive
+{
+    border-top: 2px black solid;
+    border-right: 2px black solid;
+    border-left:2px black solid;
+    border-bottom: 2px black solid;
+    text-align:center;
+    background-color:gray;
+}
+
+.inputOptions
+{
+    /*height:25px;*/
+}
+
+.inputSize
+{
+      /*width: 98px;
+        height: 40px;*/
+}
+
+
+#charttabul p {
+    font-size: 22px;
+    font-weight: bold;
+    font-style: italic;
+    color: rgb(62, 62, 62);
+    margin: 18px;
+}
+
+#chartdetails {
+    width: 100%;
+    margin-bottom: 20px;
+    float: left;
+    padding: 7px 11px;
+}
+
+#chartdatali1, #chartdatali2 {
+    float: left;
+    background-color: rgb(200,200,200);
+    padding: 0px 19px;
+    margin: 5px 2px 5px 0px;
+    color: black;
+    list-style: none;
+}
+
+#chartdatali1:hover, #chartdatali2:hover, #chartdatali1:hover a, #chartdatali2:hover a {
+		background-color: #337ab7;
+		color:white;
+	}
+	#chartdatali1 a, #chartdatali2 a {
+		text-decoration: none;
+		color: white;
+		font-size: 14px;
+		font-style: italic;
+		text-shadow: 1px 0px 3px rgb(157, 157, 157);
+        
+	}
+	#chartdatali1 { border-radius: 4px 0px 0px 4px; margin-left: 1px;}
+	#chartdatali2 { border-radius: 0px 4px 4px 0px;}
+	#chartdetails .active {
+		background-color: #337ab7;
+        border-color: #2e6da4;
+	}
+
+    #griddivdashboard {
+    overflow: auto;
+    height: 450px;
+    width: 100%;
+}
+
+
+
+
+
+
+

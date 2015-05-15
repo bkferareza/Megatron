@@ -1,0 +1,1490 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/CSS/chart.css" rel="stylesheet" />
+
+<script type="text/ng-template" id="variableTree_renderer_template_management.html">
+    <div ui-tree-handle ng-class="{ 'select': $treeScope.multiSelect, 'copy': $treeScope.copy }" class="treeNode" style="min-width:1000px">
+        <a class="btn btn-success btn-xs" nodrag ng-click="toggle(this)">
+            <span ng-show="showToggle(this)" class="glyphicon" ng-class="{ 'glyphicon glyphicon-folder-close': collapsed, 'glyphicon glyphicon-folder-open': !collapsed }"></span>
+            <span ng-show="!showToggle(this)" class="glyphicon glyphicon-stop"></span>
+        </a>
+        <span ng-if="item.Type == 2">
+            [DP]
+        </span>
+        <span ng-if="item.Type == 1">
+            [F]
+        </span>
+        <label class="userTree" ng-click="modifyDataPoint(item)">
+            {{item.FriendlyName}}
+        </label>
+    </div>
+    <ol ui-tree-nodes ng-model="item.ChildVariables" ng-class="{ 'hidden': collapsed }">
+        <li ng-repeat="item in item.ChildVariables"
+            ui-tree-node ng-class="{ 'selected': selected, 'original': original }"
+            ng-include="'variableTree_renderer_template_management.html'" style="min-width: 50px;"></li>
+    </ol>
+</script>
+
+
+<div class="row" style="overflow-y:hidden">
+    <div class="col-xs-12 col-md-3">
+        <table class="table table-responsive">
+            <thead>
+                Templates
+            </thead>
+            <tbody>
+                <tr ng-repeat="template in templates">
+                    @*<td>
+                        <input type="checkbox" ng-model="template.ShowInDashboard" />
+                    </td>*@
+                    <td>
+                        <label class="userTree" ng-click="modify(template)">
+                            {{template.Name}}
+                        </label>
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-xs-12 col-md-9">
+        <div class="row">
+            <form name="TemplateInfo" novalidate>
+                <div class="panel panel-default" style="overflow-y:auto">
+                    <div class="panel-body">
+                        <div class="col-xs-12">
+
+                            <div class="form-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"><input type="checkbox" ng-model="template.SpecialTemplate" value="true" ng-disabled="specialTemplate" />  Special Template</h3>
+                                    </div>
+                                    <div class="panel-body" style="height: 250px; overflow-y: auto; overflow-x:hidden;">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-md-2" style="white-space: nowrap;">
+                                                <label for="TemplateName" class="pull-right">Template Name*: </label>
+                                            </div>
+                                            <div class="col-xs-12 col-md-10">
+                                                <div class="row">
+                                                    <div class="col-md-7">
+
+                                                        <input ng-model="template.Name" class="form-control" name="TemplateName" ng-disabled="panel" required />
+
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <span class="error" ng-show="TemplateInfo.TemplateName.$error.required && TemplateInfo.TemplateName.$dirty">
+                                                            *  Template Name is Required!
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                         <div class="row">
+                                           <div class="col-md-6">
+                                               <div class="row">
+                                                   <div class="col-md-3">
+                                                       Month From:
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <div class="row">
+                                                           <div class="col-md-5">
+                                                               <div class="row">
+                                                                   <select name="MonthFrom" ng-model="template.MonthFromWindow"
+                                                                           class="inputOptions form-control"
+                                                                           ng-options="month.value as month.Name for month in months"
+                                                                           ng-disabled="panel"
+                                                                           required>
+                                                                       <option value="">Select Month</option>
+                                                                   </select>
+                                                               </div>
+                                                           </div>
+                                                           <div class="col-md-7">
+                                                               <span class="error" ng-show="TemplateInfo.MonthFrom.$error.required && TemplateInfo.MonthFrom.$dirty">
+                                                                   *  Month From  is Required!
+                                                               </span>
+                                                           </div>
+                                                       </div>
+                                                   </div>
+                                               </div>
+                                           </div>
+                                           <div class="col-md-6">
+                                               <div class="row">
+                                                   <div class="col-md-3">
+                                                       Month To:
+                                                   </div>
+                                                   <div class="col-md-9">
+                                                       <div class="row">
+                                                           <div class="col-md-5">
+                                                               <div class="row">
+                                                                   <select name="MonthTo" ng-model="template.MonthToWindow"
+                                                                           class="inputOptions form-control"
+                                                                           ng-options="month.value as month.Name for month in months"
+                                                                           ng-disabled="panel"
+                                                                           required>
+                                                                       <option value="">Select Month</option>
+                                                                   </select>
+                                                               </div>
+                                                           </div>
+                                                           <div class="col-md-7">
+                                                               <span class="error" ng-show="TemplateInfo.MonthTo.$error.required && TemplateInfo.MonthTo.$dirty">
+                                                                   *  Month To is Required!
+                                                               </span>
+                                                           </div>
+                                                       </div>
+
+                                                   </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Week From:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <select name="WeekFrom" ng-model="template.WeekFromWindow"
+                                                                            class="inputOptions form-control"
+                                                                            ng-options="week.value as week.Name for week in weeks"
+                                                                            ng-disabled="panel"
+                                                                            required>
+                                                                        <option value="">Select Week</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.WeekFrom.$error.required && TemplateInfo.WeekFrom.$dirty">
+                                                                    *  Week From is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Week To:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <select name="WeekTo" ng-model="template.WeekToWindow"
+                                                                            class="inputOptions form-control"
+                                                                            ng-options="week.value as week.Name for week in weeks"
+                                                                            ng-disabled="panel"
+                                                                            required>
+                                                                        <option value="">Select Week</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.WeekTo.$error.required && TemplateInfo.WeekTo.$dirty">
+                                                                    *  Week To is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Day From:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <input type="number" ng-disabled="panel" class="form-control" name="DayFrom" ng-model="template.DayFromWindow" min="1" max="31" required />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.DayFrom.$error.required && TemplateInfo.DayFrom.$dirty">
+                                                                    *  Day From is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Day To:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <input type="number" ng-disabled="panel" class="form-control" name="DayTo" ng-model="template.DayToWindow" min="1" max="31" required />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.DayTo.$error.required && TemplateInfo.DayTo.$dirty">
+                                                                    *  Day To is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Hour From:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <input type="number" class="form-control" ng-disabled="panel" name="HourFrom" ng-model="template.HourFromWindow" min="0" max="23" required />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.HourFrom.$error.required && TemplateInfo.HourFrom.$dirty">
+                                                                    *  Hour From is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        Hour To:
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="row">
+                                                            <div class="col-md-5">
+                                                                <div class="row">
+                                                                    <input type="number" ng-disabled="panel" class="form-control" name="HourTo" ng-model="template.HourToWindow" min="0" max="23" required />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-7">
+                                                                <span class="error" ng-show="TemplateInfo.HourTo.$error.required && TemplateInfo.HourTo.$dirty">
+                                                                    *  Hour To is Required!
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-md-2" style="white-space: nowrap;">
+                                                <label for="TemplateName">Charts: </label>
+                                            </div>
+                                            <div class="col-xs-12 col-md-10">
+                                                <div class="row">
+                                                    <div class="col-md-3" style="overflow: auto; height: 150px;">
+                                                        <div class="row" ng-repeat="chart in charts">
+                                                            <label class="userTree" ng-click="modifyChart(chart)">
+                                                                <span class="glyphicon glyphicon-triangle-right"></span> {{chart.Name}}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="thumbnail" ng-show="viewChart">
+                                                            <div class="caption">
+                                                                <p>
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <h4>Chart Details</h4>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="btn-group pull-right" ng-show="true">
+
+                                                                                <a href="#" class="btn btn-primary" role="button" ng-click="editChart(displayChart)">Edit</a>
+                                                                                <a href="#" class="btn btn-default" role="button"
+                                                                                   nait-confirm-click confirm="Are you sure you want to delete {{displayChart.Name}}?"
+                                                                                   do="deleteChart(displayChart)">Delete</a>
+
+                                                                                <a href="#" class="btn btn-primary" role="button" ng-click="viewChartWindow(displayChart)">View Chart</a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </p>
+                                                                <h5>Chart Name: {{displayChart.Name}}</h5>
+                                                                <p>
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            Chart Type: {{chartTypes[displayChart.ChartType-1].Name}}
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            Query Mode: {{queryModes[displayChart.QueryMode-1].Name}}
+                                                                        </div>
+                                                                    </div>
+                                                                </p>
+                                                                <p>
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            Range Type: {{displayChart.RangeType}}
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            Interval: {{logIntervals2[displayChart.Interval-1].Name}}
+                                                                        </div>
+                                                                    </div>
+                                                                </p>
+
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer">
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-default"
+                                    ng-disabled="!create"
+                                    ng-click="newTemplate()">
+                                Create Template
+                            </button>
+                            <button class="btn btn-primary btn-default"
+                                    ng-disabled="deleteTemplate"
+                                    ng-show="true"
+                                    nait-confirm-click confirm="Are you sure you want to delete {{template.Name}}?"
+                                    do="delete(template)">
+                                Delete Template
+                            </button>
+                            <button class="btn btn-primary btn-default"
+                                    ng-click="openChartWizard(template)"
+                                    ng-disabled="createChart">
+                                Create Chart
+                            </button>
+                            <button class="btn btn-primary btn-default" ng-click="saveChanges(template)"
+                                    ng-disabled="!TemplateInfo.$valid && !TemplateInfo.$touched && TemplateInfo.$error.required">
+                                Save Changes
+                            </button>
+                            <button class="btn btn-primary btn-default" ng-click="activateTemplate(template)" ng-disabled="useTemplate">
+                                Use Template
+                            </button>
+                            <button type="button" class="btn btn-primary btn-default"
+                                    ng-click="reloadPage()">
+                                Cancel
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<modal-dialoga ng-show="showChartWindow" height="100%" width="95%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentB" style="top: 2%; left:1%; width: 98%;">
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="col-md-11">
+                        <h4>{{displayChart.Name}}</h4>
+                    </div>
+                    <div class="col-md-1">
+                        <a class="btn btn-default btn-danger"
+                           ng-click="closeChartWindow()" style="margin-left: 70px;">
+                            X
+                        </a>
+                    </div>
+                </div>
+                <ul id="charttabul" ng-init="tab = 1">
+                    <li id="charttabli1" ng-class="{active:tab===1}">
+                        <a href ng-click="tab = 1">Chart</a>
+                    </li>
+                    <li id="charttabli2" ng-class="{active:tab===2}">
+                        <a href ng-click="tab = 2">Grid</a>
+                    </li>
+                    <div id="chartdiv" ng-show="tab === 1"></div>
+                    <div id="griddiv" ng-show="tab === 2">
+                        <table st-table="chartData" class="table">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="column in chartDataColumn" st-sort="{{column}}">{{column}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in chartData">
+                                    <td ng-repeat="column in chartDataColumn">{{row[column]}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</modal-dialoga>
+
+<modal-dialoga ng-show="chartWizard" height="100%" width="60%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentB">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-11">
+                            <h4>Chart Wizard</h4>
+                        </div>
+                        <div class="col-md-1">
+                            <a class="btn btn-default btn-danger"
+                               ng-click="closeWizard()">
+                                X
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div id="myCarousel"
+                     class="carousel slide carousel-fit"
+                     data-ride="carousel"
+                     data-interval="false"
+                     data-slide-to="1">
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner row-fluid" style="margin-right: -15px;">
+                        <!-- Chart Name -->
+                        <div class="item active">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 1 of 10: Chart Name
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <label for="Chart Name">Chart Name: </label>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-xs-6 col-md-6">
+                                    <input type="text" ng-model="chart.Name" class="form-control" placeholder="Chart Name" />
+                                </div>
+                                <div class="col-md-3">&nbsp;</div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">&nbsp;</div>
+                                <div class="col-md-2">
+                                    @*<a class="btn btn-default btn-primary"
+                                           href="#myCarousel"
+                                           data-slide="prev">
+                                            Back
+                                        </a>*@
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-5">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div ng-show="showNextChartName">
+                                        <a class="btn btn-default btn-primary pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Data points -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 2 of 10: Data Points
+                                        </h4>
+
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-4"
+                                     align="left"
+                                     style="overflow: scroll; height: 250px; overflow-y: auto;">
+                                    <label for="Data Point">Data Points: </label>
+                                    <ui-tree callbacks="callbacks"
+                                             drag-enabled="parameters.dragEnabled"
+                                             empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                             max-depth="parameters.maxDepth"
+                                             drag-delay="parameters.dragDelay"
+                                             drag-distance="parameters.dragDistance"
+                                             lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                             bound-to="parameters.boundTo"
+                                             spacing="parameters.spacing"
+                                             coverage="parameters.coverage"
+                                             cancel-key="parameters.cancelKey"
+                                             copy-key="parameters.copyKey"
+                                             select-key="parameters.selectKey"
+                                             expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                        <ol ui-tree-nodes ng-model="variableTree[0]">
+                                            <li ng-repeat="item in variableTree[0]" ui-tree-node
+                                                ng-class="{ 'selected': selected, 'original': original }"
+                                                ng-include="'variableTree_renderer_template_management.html'"></li>
+                                        </ol>
+                                    </ui-tree>
+                                </div>
+                                <div class="col-xs-8 col-sm-6 col-md-8"
+                                     align="left"
+                                     style="overflow: scroll; height: 250px; overflow-y: auto;">
+                                    <h4>Selected Datapoints:</h4>
+                                    <ui-tree callbacks="callbacks"
+                                             drag-enabled="parameters.dragEnabled"
+                                             empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                             max-depth="parameters.maxDepth"
+                                             drag-delay="parameters.dragDelay"
+                                             drag-distance="parameters.dragDistance"
+                                             lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                             bound-to="parameters.boundTo"
+                                             spacing="parameters.spacing"
+                                             coverage="parameters.coverage"
+                                             cancel-key="parameters.cancelKey"
+                                             copy-key="parameters.copyKey"
+                                             select-key="parameters.selectKey"
+                                             expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                        <ol ui-tree-nodes
+                                            ng-model="selected">
+                                            <li ng-repeat="item in selected" ui-tree-node
+                                                ng-class="{ 'selected': selected, 'original': original }"
+                                                ng-include="'variableTree_renderer_template_management.html'"></li>
+                                        </ol>
+                                    </ui-tree>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                    @*&nbsp;*@
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div ng-show="showNextDataPoints">
+                                        <a class="btn btn-default btn-primary  pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Ranges -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 3 of 10: Range Type
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <form name="RangeType" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            &nbsp;
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label for="RangeType">Range Type: </label>
+                                            <br />
+                                            <input type="radio" id="rangeType"
+                                                   name="rangeType"
+                                                   value='Fixed'
+                                                   ng-model="chart.RangeType"
+                                                   ng-required="!chart.RangeType"
+                                                   required /> Fixed
+                                            <input type="radio"
+                                                   id="rangeType"
+                                                   name="rangeType"
+                                                   value='Repeated'
+                                                   ng-model="chart.RangeType"
+                                                   ng-required="!chart.RangeType" /> Repeated
+                                        </div>
+                                        <div class="col-md-2">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        &nbsp;
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a class="btn btn-default btn-primary"
+                                               href="#myCarousel"
+                                               data-slide="prev">
+                                                <span class="glyphicon glyphicon-arrow-left">
+                                                </span>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-md-4">&nbsp;</div>
+
+                                        <div class="col-md-4">&nbsp;</div>
+                                        <div class="col-md-2">
+                                            <div ng-show="showNext">
+                                                <a class="btn btn-default btn-primary  pull-left"
+                                                   href="#myCarousel"
+                                                   data-slide="next">
+                                                    <span class="glyphicon glyphicon-arrow-right">
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!--Time Ranges-->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 4 of 10: Time Range
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-body" style="height:130px;">
+                                    <div class="row">
+                                        <!-- Fixed Time Range -->
+                                        <div class="row" ng-show="chart.RangeType == 'Fixed'">
+                                            <div class="col-md-1">
+                                                &nbsp;
+                                            </div>
+                                            <div class="col-md-10">
+                                                <div class="row">
+                                                    From:  <input ng-model="chart.RangeFrom"
+                                                                  class="form-control"
+                                                                  name="DateRangeFrom"
+                                                                  type="datetime-local" ng-disabled="panel" />
+                                                    To:  <input ng-model="chart.RangeTo"
+                                                                class="form-control"
+                                                                name="DateRangeTo"
+                                                                type="datetime-local"
+                                                                ng-disabled="panel" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                &nbsp;
+                                            </div>
+                                        </div>
+                                        <!-- Repeated Time Range -->
+                                        <div class="row" ng-show="chart.RangeType == 'Repeated'">
+                                            <div ng-show="showRangeOption">
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label for="RangeType" class="pull-right">Range Option: </label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <select name="Options" ng-model="chart.RangeOption"
+                                                                class="inputOptions form-control"
+                                                                ng-options="rangeOption.value as rangeOption.Name for rangeOption in rangeOptions" ng-disabled="panel" required>
+                                                            <option value="">Select Interval: </option>
+                                                        </select>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- X Value-->
+                                                <div ng-show="showXValueTimeRange">
+                                                    <div class="row">
+                                                        <div ng-show="showRangeOptionValue" class="col-md-12">
+                                                            <div class="col-md-6">
+                                                                <label for="RangeType" class="pull-right">Number of {{XVALUE}} passed: </label>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="row">
+                                                                    <div class="col-md-5">
+                                                                        <input type="text"
+                                                                               min="1"
+                                                                               max="1000"
+                                                                               ng-model="chart.RangeXValue"
+                                                                               placeholder="1 - 1000"
+                                                                               valid-input input-pattern="[^0-9]+"
+                                                                               class="form-control" />
+                                                                    </div>
+                                                                    <div class="col-md-7">
+                                                                        <span class="error pull-left" ng-show="xvalueWarning">
+                                                                            * Value is more than the limit.
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div ng-show="showNextTimeRange">
+                                        <a class="btn btn-default btn-primary  pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                         </div>
+                        <!-- Log Interval -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 5 of 10: Log Interval
+                                        </h4>
+
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    &nbsp;
+                                </div>
+                                <div class="col-xs-6 col-md-2" align="right" style="white-space: nowrap;">
+                                    <label for="Interval" class="pull-right">Log Interval: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="Interval" ng-model="chart.Interval"
+                                                    class="inputOptions form-control"
+                                                    ng-options="logInterval.value as logInterval.Name for logInterval in logIntervals"
+                                                    ng-disabled="panel" required>
+                                                <option value="">Select Interval: </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.Interval.$error.required && chartInfo.Interval.$dirty">
+                                                *  Interval Required
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary  pull-left"
+                                       href="#myCarousel"
+                                       data-slide="next">
+                                        <span class="glyphicon glyphicon-arrow-right">
+                                        </span>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Chart Properties -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 6 of 10: Chart Properties
+                                        </h4>
+
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                    <label for="QueryMode" class="pull-right"> Query Mode: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="QueryMode" ng-model="chart.QueryMode"
+                                                    class="inputOptions form-control"
+                                                    ng-options="querymode.value as querymode.Name for querymode in queryModes" ng-disabled="panel" required>
+                                                <option value="">Select Query Mode</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.QueryMode.$error.required && chartInfo.QueryMode.$dirty">
+                                                *  QueryMode Required
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                    <label for="ChartType" class="pull-right"> Chart Type: </label>
+                                </div>
+                                <div class="col-xs-12 col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="ChartType" ng-model="chart.ChartType"
+                                                    class="inputOptions form-control"
+                                                    ng-options="chartype.value as chartype.Name for chartype in chartTypes" ng-disabled="panel" required>
+                                                <option value="">Select Chart Type </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <span class="error" ng-show="chartInfo.ChartType.$error.required && chartInfo.ChartType.$dirty">
+                                                *  ChartType Required
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div>
+                                        <a class="btn btn-default btn-primary  pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                        &nbsp;
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Benchmark -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 7 of 10: Benchmark Range
+                                        </h4>
+
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-1">
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-10">
+
+                                    <div class="panel">
+                                        <div class="panel-body" style="height:130px;">
+                                            <div class="row">
+                                                <!-- Fixed Benchmark Range -->
+                                                <div class="row" ng-show="chart.RangeType == 'Fixed'">
+                                                    <div class="col-md-1">
+                                                        &nbsp;
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <div class="row">
+                                                            <form name="Benchmark" novalidate>
+                                                                From:  <input ng-model="chart.BenchmarkFrom"
+                                                                              class="form-control"
+                                                                              name="BenchmarkFrom"
+                                                                              type="datetime-local" ng-disabled="panel" />
+                                                                To:  <input ng-model="chart.BenchmarkTo"
+                                                                            class="form-control"
+                                                                            name="BenchmarkTo"
+                                                                            type="datetime-local"
+                                                                            ng-disabled="panel" />
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        &nbsp;
+                                                    </div>
+                                                </div>
+                                                <!-- Repeated Time Range -->
+                                                <div class="row" ng-show="chart.RangeType == 'Repeated'">
+                                                    <div ng-show="showRangeOption">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label for="RangeType" class="pull-right">Range Option: </label>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <select name="Options" ng-model="chart.RangeBenchMarkOption"
+                                                                        class="inputOptions form-control"
+                                                                        ng-options="rangeOption.value as rangeOption.Name for rangeOption in rangeOptions" ng-disabled="panel" required>
+                                                                    <option value="">Select Interval: </option>
+                                                                </select>
+
+                                                            </div>
+                                                        </div>
+
+
+                                                        <!-- X Value-->
+                                                        <div ng-show="showXValueBenchmark">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="col-md-6">
+                                                                        <label for="RangeType" class="pull-right">Number of {{XVALUE2}} passed: </label>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="row">
+                                                                            <div class="col-md-5">
+                                                                                <input type="text"
+                                                                                       min="1"
+                                                                                       max="1000"
+                                                                                       ng-model="chart.RangeBenchmarkXValue"
+                                                                                       placeholder="1 - 1000"
+                                                                                       valid-input input-pattern="[^0-9]+"
+                                                                                       class="form-control" />
+                                                                            </div>
+                                                                            <div class="col-md-7">
+                                                                                <span class="error pull-left" ng-show="xvalueWarning">
+                                                                                    * Value is more than the limit.
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-md-1">
+                                    &nbsp;
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div ng-show="showNextBenchmark ||
+                                         (!Benchmark.BenchmarkFrom.$dirty && !Benchmark.BenchmarkTo.$dirty)">
+                                        <a class="btn btn-default btn-primary  pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Aggregate -->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 8 of 10: Aggregate Options
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-1">
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                            <label for="Normal" class="pull-right"> Aggregate Option Normal: </label>
+                                        </div>
+                                        <div class="col-xs-12 col-md-8">
+
+                                            <select name="QueryMode" ng-model="chart.AggregateOptionNormal"
+                                                    class="inputOptions form-control"
+                                                    ng-options="aggregateOption.value as aggregateOption.Name for aggregateOption in aggregateOptions"
+                                                    ng-disabled="panel">
+                                                <option value="">Select Aggregate Option</option>
+                                            </select>
+
+                                        </div>
+
+
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-md-4" style="white-space: nowrap;">
+                                            <label for="Faulty" class="pull-right"> Aggregate Option Faulty: </label>
+                                        </div>
+                                        <div class="col-xs-12 col-md-8">
+
+                                            <select name="QueryMode" ng-model="chart.AggregateOptionFaulty"
+                                                    class="inputOptions form-control"
+                                                    ng-options="aggregateOption.value as aggregateOption.Name for aggregateOption in aggregateOptions2"
+                                                    ng-disabled="panel">
+                                                <option value="">Select Aggregate Option</option>
+                                            </select>
+
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-md-2">
+                                        <a class="btn btn-default btn-primary"
+                                           href="#myCarousel"
+                                           data-slide="prev">
+                                            <span class="glyphicon glyphicon-arrow-left">
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4">&nbsp;</div>
+                                    <div class="col-md-4">&nbsp;</div>
+                                    <div class="col-md-2">
+                                        <a class="btn btn-default btn-primary pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--Specific Aggregate-->
+                        <div class="item">
+                            <div class="row">
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 9 of 10: Aggregate Specific Time
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div ng-show="showAggregateSpecific">
+                                <div class="row">
+                                    <!-- Months -->
+                                    <div class="row" ng-show="showMonths">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label for="Month"
+                                                       class="pull-right">Month:</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select name="Options" ng-model="chart.Month"
+                                                        class="inputOptions pull-left inputSize form-control"
+                                                        ng-options="month.Name for month in months"
+                                                        required>
+                                                    <option value="">Select Month: </option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!-- Days -->
+                                    <div class="row" ng-show="showDays">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label class="pull-right">Days:</label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row">
+                                                            <input type="text"
+                                                                   min="{{DayLow}}"
+                                                                   max="{{dayNumber}}"
+                                                                   ng-model="chart.Day"
+                                                                   placeholder="(1-31)"
+                                                                   ng-disabled="!enableNumericFunctions"
+                                                                   valid-input input-pattern="[^0-9]+"
+                                                                   class="pull-left inputSize form-control" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8 text-left">
+                                                        <span class="error" ng-show="daysWarning">
+                                                            *  Value is more than the limit.
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!-- Weeks -->
+                                    <div class="row" ng-show="showWeeks">
+                                        <div class="row" style="padding:5px; margin:5px;">
+                                            <div class="col-md-5">
+                                                <label class="pull-right">Day of Week:</label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div ng-style="dayStyle"
+                                                     ng-repeat="day in days"
+                                                     ng-class="day.Checked? dayStyle={'background-color':'lightgreen'}:dayStyle={'background-color':'white'}"
+                                                     ng-click="toggleDay(day)"
+                                                     class="col-md-1 text-center"
+                                                     id="days"
+                                                     ng-show="showWeeks">
+                                                    {{day.Tag}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Hours-->
+                                    <div class="row" ng-show="showHours">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label class="pull-right">Hours:</label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row">
+                                                            <input type="text"
+                                                                   min="{{HourLow}}"
+                                                                   max="{{HourHigh}}"
+                                                                   class="pull-left inputSize form-control"
+                                                                   ng-model="chart.Hours"
+                                                                   ng-disabled="!enableNumericFunctions"
+                                                                   valid-input input-pattern="[^0-9]+"
+                                                                   placeholder="(0 - 23)" /> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8 text-left">
+                                                        <span class="error" ng-show="hoursWarning">
+                                                            *  Value is more than the limit.
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <!--Minutes-->
+                                    <div class="row" ng-show="showMinutes">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label class="pull-right">Minutes:</label>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="row">
+                                                            <input type="text"
+                                                                   min="0"
+                                                                   max="59"
+                                                                   class="pull-left inputSize form-control"
+                                                                   ng-model="chart.Minutes"
+                                                                   ng-disabled="!enableNumericFunctions"
+                                                                   valid-input input-pattern="[^0-9]+"
+                                                                   placeholder="(0-59)" />
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    <div class="col-md-8 text-left">
+                                                       
+                                                        <span class="error" ng-show="minutesWarning">
+                                                            *  Value is more than the limit.
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-hide="showAggregateSpecific">
+                                <div class="row">
+                                    <h3>
+                                        No Action Needed
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div ng-show="showNextSpecificAggregate">
+                                        <a class="btn btn-default btn-primary pull-left"
+                                           href="#myCarousel"
+                                           data-slide="next">
+                                            <span class="glyphicon glyphicon-arrow-right">
+                                            </span>
+                                        </a>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Chart Preview -->
+                        <div class="item">
+                            <div class="row">
+                                <div class="progress" ng-show="logging">
+                                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                        {{Message}}
+                                    </div>
+                                </div>
+                                <header style="width: 100%; whitespace: nowrap; ">
+                                    <div class="navbar-header navbar-brand">
+
+                                        <h4>
+                                            Step 10 of 10: Chart Preview
+                                        </h4>
+
+                                    </div>
+                                </header>
+                            </div>
+                            <div class="row">
+                                <label>Chart Details: </label>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12 col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="thumbnail">
+                                                <div class="caption"
+                                                     align="left"
+                                                     style="height: 250px; overflow: scroll;">
+                                                    <h3>Chart Details</h3>
+                                                    <p>Chart Name: {{chart.Name}}</p>
+                                                    <p>Chart Type: {{chartTypes[chart.ChartType-1].Name}}</p>
+                                                    <p>Query Mode: {{queryModes[chart.QueryMode-1].Name}}</p>
+                                                    <p>Range Type: {{chart.RangeType}}</p>
+                                                    <p>Interval: {{logIntervals2[chart.Interval-1].Name}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div align="left"
+                                                 style="height: 250px; overflow: scroll; overflow-y:hidden">
+                                                <h3>Selected Datapoints</h3>
+                                                <ui-tree callbacks="callbacks"
+                                                         drag-enabled="parameters.dragEnabled"
+                                                         empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                                                         max-depth="parameters.maxDepth"
+                                                         drag-delay="parameters.dragDelay"
+                                                         drag-distance="parameters.dragDistance"
+                                                         lock-x="parameters.lockX" lock-y="parameters.lockY"
+                                                         bound-to="parameters.boundTo"
+                                                         spacing="parameters.spacing"
+                                                         coverage="parameters.coverage"
+                                                         cancel-key="parameters.cancelKey"
+                                                         copy-key="parameters.copyKey"
+                                                         select-key="parameters.selectKey"
+                                                         expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+                                                    <ol ui-tree-nodes
+                                                        ng-model="selected">
+                                                        <li ng-repeat="item in selected" ui-tree-node
+                                                            ng-class="{ 'selected': selected, 'original': original }"
+                                                            ng-include="'variableTree_renderer_template_management.html'"></li>
+                                                    </ol>
+                                                </ui-tree>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                &nbsp;
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <a class="btn btn-default btn-primary"
+                                       href="#myCarousel"
+                                       data-slide="prev">
+                                        <span class="glyphicon glyphicon-arrow-left">
+                                        </span>
+                                    </a>
+                                    &nbsp;
+                                </div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-4">&nbsp;</div>
+                                <div class="col-md-2">
+                                    <div>
+                                        <a class="btn btn-default btn-success pull-left" ng-click="saveChart(chart)">
+                                            Save
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-md-3">
+                    &nbsp;
+                </div>
+                <div class="col-md-3">
+                    &nbsp;
+                </div>
+                <div class="col-md-4">
+                    &nbsp;
+                </div>
+                <div class="col-md-2">
+                    &nbsp;
+                </div>
+            </div>
+        </div>
+</modal-dialoga>

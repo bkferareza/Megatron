@@ -1,0 +1,365 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/CSS/user.css" rel="stylesheet" />
+
+<script type="text/ng-template" id="variableTree_renderer_user_folder_access.html">
+    <div ui-tree-handle ng-class="{ 'select': $treeScope.multiSelect, 'copy': $treeScope.copy }" class="treeNode" style="min-width:1000px">
+        <input ng-disabled="!rightPanelEnabled" type="checkbox" class="checkbox-inline check-user-folder-access" ng-model="item.UserHasAccess" ng-change="cascadeCheck(this)" />
+        <a class="btn btn-success btn-xs" nodrag ng-click="toggle(this)">
+            <span ng-show="showToggleUserFolderAccess(this)" class="glyphicon" ng-class="{ 'glyphicon glyphicon-folder-close': collapsed, 'glyphicon glyphicon-folder-open': !collapsed }"></span>
+            <span ng-show="!showToggleUserFolderAccess(this)" class="glyphicon glyphicon-stop"></span>
+        </a>
+        <img width="24" height="24" id="icon" ng-src="Dump/Icon/{{item.ID}}/{{item.Icon}}" ng-if="item.Icon != 'defaultIcon'">
+        <span ng-if="item.Type == 1">
+            [F]
+        </span>
+        <span ng-if="item.Type == 2">
+            [DP]
+        </span>
+        <label class="userTree">
+            {{item.FriendlyName}}
+        </label>
+    </div>
+    <ol ui-tree-nodes ng-model="item.ChildVariables" ng-class="{ 'hidden': collapsed }">
+        <li ng-repeat="item in item.ChildVariables"
+            ui-tree-node ng-class="{ 'selected': selected, 'original': original }"
+            ng-include="'variableTree_renderer_user_folder_access.html'" style="min-width: 50px;"></li>
+    </ol>
+</script>
+
+<div class="row">
+    <div class="col-md-2" id="left-panel" style="margin-left: 15px;">
+        <h4> User Hierarchy</h4>
+        <ui-tree callbacks="callbacks"
+                 drag-enabled="parameters.dragEnabled"
+                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                 max-depth="parameters.maxDepth"
+                 drag-delay="parameters.dragDelay"
+                 drag-distance="parameters.dragDistance"
+                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                 bound-to="parameters.boundTo"
+                 spacing="parameters.spacing"
+                 coverage="parameters.coverage"
+                 cancel-key="parameters.cancelKey"
+                 copy-key="parameters.copyKey"
+                 select-key="parameters.selectKey"
+                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+            <ol ui-tree-nodes ng-model="list">
+                <li ng-repeat="account in list" ui-tree-node
+                    ng-class="{ 'selected': selected, 'original': original }"
+                    ng-include="'items_renderer.html'"></li>
+            </ol>
+        </ui-tree>
+    </div>
+    <div class="col-md-7" id="user-details-panel" style="margin-right: -15px;">
+        <div class="row">
+            <div class="col-md-12">
+                <form name="UserInfo" novalidate>
+                    <div class="form-group text-right">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="modal-title text-center" id="modal-title" style="margin-bottom: 10px;"> User Information</h3>
+                            </div>
+                            <div class="col-md-6">
+                                &nbsp;
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="FirstName"> First Name :</label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <input ng-disabled="panel || !$Permissions.permissions().CanModifyUsers" ng-model="user.GivenName" class="form-control" name="FirstName" char-limit="20" required />
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                        <span class="error" ng-show="UserInfo.FirstName.$error.required && UserInfo.FirstName.$dirty">
+                                            *  First name is required.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="LastName"> Last Name : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <input ng-disabled="panel || !$Permissions.permissions().CanModifyUsers" ng-model="user.Surname" class="form-control" name="LastName" char-limit="20" required />
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                        <span class="error" ng-show="UserInfo.LastName.$error.required && UserInfo.LastName.$dirty">
+                                            *  Last name is required.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Email"> Email : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <input ng-disabled="!activeEmail || !$Permissions.permissions().CanModifyUsers" ng-model="user.EmailAddress" class="form-control" name="Email" type="email" char-limit="50" required />
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                        <span class="error" ng-show="UserInfo.Email.$error.required  && UserInfo.Email.$dirty">
+                                            * Email is required.
+                                        </span>
+                                        <span class="error" ng-show="UserInfo.Email.$error.email">
+                                            * Email is not valid.
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Username"> Username : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <input ng-disabled="!activeUsername" ng-model="user.Username" class="form-control" name="Username" char-limit="20" required />
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                        <span class="error" ng-show="UserInfo.Username.$error.required && UserInfo.Username.$dirty">
+                                            * Username is required.
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="row" ng-show="accessType && isSuperAdmin">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Status"> Status : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8 text-left">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <select ng-disabled="activeStatus  || !$Permissions.permissions().CanModifyUsers" name="Status" class="form-control" ng-model="user.Status" ng-options="stat.value for stat in status"
+                                                ng-init="stat.value = status[user.Status - 1]">
+                                            <option value="">Select User Status </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="accessType && isSuperAdmin">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Group"> Group : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8 text-left">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <select ng-disabled="activeStatus  || !$Permissions.permissions().CanModifyUsers" name="Group" class="form-control" ng-model="user.Group" ng-options="group.Name for group in groups">
+                                            <option value="">Select Group</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="accessType && isSuperAdmin">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Type"> Type : </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8 text-left">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <select ng-disabled="!newUser || !$Permissions.permissions().CanModifyUsers" name="Type" class="form-control" ng-model="user.AccessType" ng-options="role.value for role in roles"
+                                                ng-init="role.value = roles[user.AccessType-1]">
+                                            <option value="">Select User Type</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 " style="white-space: nowrap;">
+                                <label for="Expiration">Access Expiration: </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <input ng-disabled="noExpiration || panel || !$Permissions.permissions().CanModifyUsers" id="theDate" ng-model="user.Expiration" placeholder="yyyy-MM-dd" class="form-control" name="Expiration" type="date" />
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                        <input ng-disabled="panel || !$Permissions.permissions().CanModifyUsers" style="margin-left: -15px;" type="checkbox" ng-click="NoExpiration()" id="noExpiry" class="checkbox-inline" ng-model="user.NoExpiration" /> No Expiration
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="BackgroundImage" style="white-space: nowrap;">Background Image: </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input ng-hide="true" type="file" ng-file-select ng-model="backgroundImageFile" name="File" id="backgroundImageUploadButton" ng-change="updateBackgroundImageFileName()" />
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        <input disabled="disabled" ng-model="backgroundImageFileName" class="form-control" />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-primary btn-default"
+                                                style="margin-left: -30px;"
+                                                ng-click="clickBackgroundImageUploadButton()"
+                                                ng-disabled="panel || !$Permissions.permissions().CanModifyUsers || !$Permissions.permissions().CanModifyBackgroundImage">
+                                            ...
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4">
+                                <label for="BackgroundStyle" style="white-space: nowrap;">Background Style:</label>
+                            </div>
+                            <div class="col-xs-12 col-md-8 text-left">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <select ng-model="user.BackgroundImageStyle" ng-disabled="panel || !$Permissions.permissions().CanModifyUsers || !$Permissions.permissions().CanModifyBackgroundImage" class="form-control">
+                                            <option value="0">None</option>
+                                            <option value="1">Center</option>
+                                            <option value="2">Fill</option>
+                                            <option value="3">Stretch</option>
+                                            <option value="4">Tiled</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 text-left">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-4 ">
+                                <label for="Logo" style="white-space: nowrap;">Logo Image: </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input ng-hide="true" 
+                                               type="file" 
+                                               ng-file-select 
+                                               ng-model="logoFile" 
+                                               name="File" 
+                                               id="logoUploadButton" 
+                                               ng-change="updateLogoFileName()" />
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        <input disabled="disabled" ng-model="logoFileName" class="form-control" />
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-primary btn-default"
+                                                style="margin-left: -30px;"
+                                                ng-click="clickLogoUploadButton()"
+                                                ng-disabled="panel || !$Permissions.permissions().CanModifyUsers || !$Permissions.permissions().CanModifyLogo">
+                                            ...
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary btn-default" id="add-user-group"
+                                    style="margin-top: 20px;margin-bottom: 0px;"
+                                    ng-click="loadGroup(0,user.UserId)"
+                                    ng-disabled="newUser"
+                                    ng-if="$Permissions.permissions().CanCreateGroups">
+                                Add Group
+                            </button>
+                            <button type="button" class="btn btn-primary btn-default"
+                                    style="margin-top: 20px;margin-bottom: 0px;"
+                                    ng-click="addUser()"
+                                    ng-disabled="newUser"
+                                    ng-if="$Permissions.permissions().CanCreateUsers">
+                                Add User
+                            </button>
+                            <button type="button" class="btn btn-primary btn-default"
+                                    style="margin-top: 20px;margin-bottom: 0px; "
+                                    ng-disabled="activeDelete"
+                                    nait-confirm-click confirm="Are you sure you want to delete {{user.Name}}?" do="deleteUser(user)"
+                                    ng-if="$Permissions.permissions().CanDeleteUsers">
+                                Delete User
+                            </button>
+                            <button type="button" class="btn btn-primary btn-default"
+                                    style="margin-top: 20px;margin-bottom: 0px; "
+                                    ng-disabled="activeEdit"
+                                    nait-confirm-click confirm="Are you sure you want to reset password for {{user.Name}}?" do="resetPassword(user)"
+                                    ng-if="$Permissions.permissions().CanModifyUsers">
+                                Reset Password
+                            </button>
+                            <button type="button" class="btn btn-primary btn-default"
+                                    style="margin-top: 20px;margin-bottom: 0px; "
+                                    ng-click="saveChanges(user)"
+                                    ng-disabled="!UserInfo.$valid"
+                                    ng-if="$Permissions.permissions().CanModifyUsers">
+                                Save Changes
+                            </button>
+                            <button id="reload-page" type="button" class="btn btn-primary btn-default"
+                                    style="margin-top: 20px;margin-bottom: 0px;"
+                                    ng-click="reloadPage()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="col-md-10" id="group-details-panel" style="display: none; margin-right: -15px;">
+
+    </div>
+    <div class="col-md-3" id="right-panel" ng-disabled="rightPanelEnabled">
+        <h4> User Folder Access</h4>
+        <span ng-if="variableTree[0].length <=0" style="margin-top:15px;">No folder to assign</span>
+        <ui-tree callbacks="callbacks"
+                 drag-enabled="parameters.dragEnabled"
+                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                 max-depth="parameters.maxDepth"
+                 drag-delay="parameters.dragDelay"
+                 drag-distance="parameters.dragDistance"
+                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                 bound-to="parameters.boundTo"
+                 spacing="parameters.spacing"
+                 coverage="parameters.coverage"
+                 cancel-key="parameters.cancelKey"
+                 copy-key="parameters.copyKey"
+                 select-key="parameters.selectKey"
+                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover"
+                 ng-if="variableTree[0].length > 0">
+            <ol ui-tree-nodes ng-model="variableTree[0]">
+                <li ng-repeat="item in variableTree[0]" ui-tree-node
+                    ng-class="{ 'selected': selected, 'original': original }"
+                    ng-include="'variableTree_renderer_user_folder_access.html'"></li>
+            </ol>
+        </ui-tree>
+    </div>
+
+</div>

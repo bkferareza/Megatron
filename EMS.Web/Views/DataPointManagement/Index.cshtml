@@ -1,0 +1,482 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/CSS/datapoint.css" rel="stylesheet" />
+
+<script type="text/ng-template" id="variableTree_renderer_datapoint_management.html">
+    <div ui-tree-handle ng-class="{ 'select': $treeScope.multiSelect, 'copy': $treeScope.copy }" class="treeNode" style="min-width:1000px">
+        <a class="btn btn-success btn-xs" nodrag ng-click="toggle(this)">
+            <span ng-show="showToggle(this)" class="glyphicon" ng-class="{ 'glyphicon glyphicon-folder-close': collapsed, 'glyphicon glyphicon-folder-open': !collapsed }"></span>
+            <span ng-show="!showToggle(this)" class="glyphicon glyphicon-stop"></span>
+        </a>
+        <img width="24" height="24" id="icon" ng-src="Dump/Icon/{{item.ID}}/{{item.Icon}}" ng-if="item.Icon != 'defaultIcon'">
+        <span ng-if="item.Type == 1">
+            [F]
+        </span>
+        <span ng-if="item.Type == 2">
+            [DP]
+        </span>
+        <label class="userTree" ng-click="modify(this)">
+            {{item.FriendlyName}}
+        </label>
+    </div>
+    <ol ui-tree-nodes ng-model="item.ChildVariables" ng-class="{ 'hidden': collapsed }">
+        <li ng-repeat="item in item.ChildVariables"
+            ui-tree-node ng-class="{ 'selected': selected, 'original': original }"
+            ng-include="'variableTree_renderer_datapoint_management.html'" style="min-width: 50px;"></li>
+    </ol>
+</script>
+
+<div class="row">
+    <div class="col-xs-4 col-md-4" id="left-panel" style="margin-left: 15px;">
+        <ui-tree callbacks="callbacks"
+                 drag-enabled="parameters.dragEnabled"
+                 empty-placeholder-enabled="parameters.emptyPlaceholderEnabled"
+                 max-depth="parameters.maxDepth"
+                 drag-delay="parameters.dragDelay"
+                 drag-distance="parameters.dragDistance"
+                 lock-x="parameters.lockX" lock-y="parameters.lockY"
+                 bound-to="parameters.boundTo"
+                 spacing="parameters.spacing"
+                 coverage="parameters.coverage"
+                 cancel-key="parameters.cancelKey"
+                 copy-key="parameters.copyKey"
+                 select-key="parameters.selectKey"
+                 expand-on-hover="(parameters.enableExpandOnHover) ? parameters.expandOnHover : parameters.enableExpandOnHover">
+            <ol ui-tree-nodes ng-model="variableTree[0]">
+                <li ng-repeat="item in variableTree[0]" ui-tree-node
+                    ng-class="{ 'selected': selected, 'original': original }"
+                    ng-include="'variableTree_renderer_datapoint_management.html'"></li>
+            </ol>
+        </ui-tree>
+    </div>
+    <div class="col-xs-8 col-sm-6 col-md-8" style="margin-right: -15px; padding-left: 50px;">
+        <div class="row">
+            <form name="DataPointInfo" novalidate>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="modal-title text-left" id="modal-title" ng-show="datapoint.Type == 1" style="margin-bottom: 10px;"> Folder Information</h3>
+                            <h3 class="modal-title text-left" id="modal-title" ng-show="datapoint.Type == 2" style="margin-bottom: 10px;"> Datapoint Information</h3>
+                        </div>
+                        <div class="col-md-6">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2 col-md-2 text-right">
+                            <label for="TagName"> Tag Name* :</label>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            <input ng-model="datapoint.TagName" class="form-control" name="TagName" required ng-disabled="!panel" maxlength="50" />
+                        </div>
+                        <div class="col-xs-5 col-md-5">
+                            <span class="error" ng-show="DataPointInfo.TagName.$error.required  && DataPointInfo.TagName.$dirty">
+                                * Tag Name is required
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2 col-md-2 text-right">
+                            <label for="FriendlyName"> Friendly Name* :</label>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            <input ng-model="datapoint.FriendlyName" class="form-control" name="FriendlyName" required ng-disabled="!panel" maxlength="50" />
+                        </div>
+                        <div class="col-xs-5 col-md-5">
+                            <span class="error" ng-show="DataPointInfo.FriendlyName.$error.required  && DataPointInfo.FriendlyName.$dirty">
+                                * Friendly Name is required
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2 col-md-2 text-right">
+                            <label for="Icon" style="white-space: nowrap;"> Icon: </label>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input ng-hide="true" type="file" ng-file-select ng-model="iconFile" name="File" id="iconUploadButton" ng-change="updateIconFileName()" />
+                                </div>
+
+                                <div class="col-md-10">
+                                    <input disabled="disabled" ng-model="iconFileName" class="form-control" style="width: 272px;" />
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-primary btn-default"
+                                            style="margin-left: 21px;"
+                                            ng-click="clickIconUploadButton()"
+                                            ng-disabled="!panel">
+                                        ...
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2 col-md-2 text-right">
+                            <label for="Color">Color: </label>
+                        </div>
+                        <div class="col-xs-4 col-md-4">
+                            <div class="row">
+                                <div class="col-md-4" ng-disabled="!panel">
+                                    <ui-colorpicker ng-model="datapoint.Color"></ui-colorpicker>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="input-sm" disabled="disabled" style="width: 92px; margin-left: -50px;" ng-model="datapoint.Color" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <button class="btn btn-primary btn-default" ng-click="openFolderModal(true)">
+                Add Root Folder
+            </button>
+            <button class="btn btn-primary btn-default" ng-click="openFolderModal(false)" ng-disabled="!isSelectedFolder">
+                Add Sub Folder
+            </button>
+            <button class="btn btn-primary btn-default" ng-click="openDataPointModal()" ng-disabled="!isSelectedFolder">
+                Add Data Point
+            </button>
+            <button class="btn btn-primary btn-default" ng-click="saveChanges(datapoint)" ng-disabled="(!isSelectedFolder && !isSelectedDatapoint)">
+                Save Changes
+            </button>
+            <button class="btn btn-primary btn-default" ng-disabled="!canDelete"
+                    nait-confirm-click confirm="Are you sure you want to delete {{datapoint.FriendlyName}}?" do="deleteVariable(datapoint)">
+                Delete
+            </button>
+            <button class="btn btn-primary btn-default" ng-click="openImportModal()">
+                Import
+            </button>
+        </div>
+    </div>
+</div>
+
+<modal-dialogA ng-show="addFolderModal" height="100%" width="60%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentA">
+            <div class="modal-body">
+                <form name="addFolder"
+                      novalidate>
+                    <div class="form-group">
+                        <h4 class="modal-title"
+                            id="myModalLabel" ng-show="isRootFolder" style="margin-bottom: 10px;">
+                            Add Root Folder
+                        </h4>
+                        <h4 class="modal-title"
+                            id="myModalLabel" ng-show="!isRootFolder" style="margin-bottom: 10px;">
+                            Add Sub Folder
+                        </h4>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderName">Tag Name: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="input-sm" type="text" ng-model="datapoint.TagName" required maxlength="50" />
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderName">Friendly Name: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="input-sm" type="text" ng-model="datapoint.FriendlyName" required maxlength="50" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderIcon">Icon: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input ng-hide="true" type="file" ng-file-select ng-model="iconFile" name="File" id="iconUploadButtonAddFolder" ng-change="updateIconFileName()" />
+                                        </div>
+                                        <div class="col-md-10">
+                                            <input disabled="disabled" ng-model="iconFileName" class="form-control" style="width: 151px;" />
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-primary btn-default"
+                                                    style="margin-left: -7px;"
+                                                    ng-click="clickIconUploadButtonAddFolder()">
+                                                ...
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderColor">Color: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ui-colorpicker ng-model="datapoint.Color"></ui-colorpicker>
+                                        </div>
+                                        <div class="col-md-6" style="margin-left: -44px;">
+                                            <input class="input-sm" style="width:100px;" ng-model="datapoint.Color" ng-disabled="true" />
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                       
+                    </div>
+                    <div class="btn-group" style="float: right; margin-top: 20px; margin-bottom: 20px;">
+                        <button type="submit"
+                                class="btn btn-primary"
+                                value="Submit" ng-disabled="productEdit.$invalid"
+                                ng-click="saveChanges(datapoint)">
+                            Save
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-default"
+                                data-dismiss="modal"
+                                ng-click="close()">
+                            Close
+                        </button>
+                    </div>
+                    </form>
+            </div>
+
+
+        </div>
+
+    </div>
+</modal-dialogA>
+
+<modal-dialogA ng-show='addDataPointModal' height="100%" width="60%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentA">
+            <div class="modal-body">
+                <form name="addDataPoint"
+                      novalidate>
+                    <div class="form-group">
+                        <h4 class="modal-title"
+                            id="myModalLabel" style="margin-bottom: 10px;">
+                            Add Data Point
+                        </h4>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderName">Tag Name: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="input-sm" type="text" ng-model="datapoint.TagName" required maxlength="50" />
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderName">Friendly Name: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <input class="input-sm" type="text" ng-model="datapoint.FriendlyName" required maxlength="50" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderIcon">Icon: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input ng-hide="true" type="file" ng-file-select ng-model="iconFile" name="File" id="iconUploadButtonAddDatapoint" ng-change="updateIconFileName()" />
+                                        </div>
+                                        <div class="col-md-10">
+                                            <input disabled="disabled" ng-model="iconFileName" class="form-control" style="width: 151px;" />
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-primary btn-default"
+                                                    style="margin-left: -7px;"
+                                                    ng-click="clickIconUploadButtonAddDatapoint()">
+                                                ...
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="FolderColor">Color: </label>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ui-colorpicker ng-model="datapoint.Color"></ui-colorpicker>
+                                        </div>
+                                        <div class="col-md-6" style="margin-left: -44px;">
+                                            <input class="input-sm" style="width:100px;" ng-model="datapoint.Color" ng-disabled="true" />
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <br />
+                        </div>
+                    <br />
+                    <div class="btn-group" style="float: right; margin-top: 20px; margin-bottom: 20px;">
+                        <button type="submit"
+                                class="btn btn-primary"
+                                value="Submit"
+                                ng-click="saveChanges(datapoint)">
+                            Save
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-default"
+                                data-dismiss="modal"
+                                ng-click="close()">
+                            Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+
+    </div>
+</modal-dialogA>
+
+<modal-dialoga ng-show="importModal" height="100%" width="60%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentA">
+            <div class="modal-body">
+                <form name="addFolder"
+                      novalidate>
+                    <div class="form-group">
+                        <h4 class="modal-title"
+                            id="myModalLabel" style="margin-bottom: 10px;">
+                            Import Datapoint
+                        </h4>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="FolderIcon">Import File: </label>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input ng-hide="true" type="file" ng-file-select ng-model="importFile" name="File" id="importUploadButton" ng-change="updateImportFileName()" accept=".csv" multiple="false" />
+                                        </div>
+                                        <div class="col-md-10">
+                                            <input disabled="disabled" ng-model="importFileName" class="form-control" style="width: 250px;" />
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-primary btn-default"
+                                                    style="margin-left: -25px;"
+                                                    ng-click="clickImportUploadButton()">
+                                                ...
+                                            </button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="btn-group" style="float: right; margin-top: 20px; margin-bottom: 20px;">
+                        <button type="submit"
+                                class="btn btn-primary"
+                                value="Submit"
+                                ng-click="previewImport()"
+                                ng-disabled="importFileName == ''">
+                            Preview
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-default"
+                                data-dismiss="modal"
+                                ng-click="close()">
+                            Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+
+    </div>
+</modal-dialoga>
+
+<modal-dialoga ng-show="previewResultsModal" height="100%" width="60%">
+    <div class="ng-modal-overlay">
+        <div class="modal-contentB">
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="col-md-12" style="margin-left: -25px;">
+                        <h4>Import Datapoint</h4>
+                    </div>
+                </div>
+                <div style="width: 100%; height: 480px; overflow: auto; margin-top: 50px;">
+                    <table st-table="previewFileResults" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th st-sort="LineNumber">No</th>
+                                <th st-sort="Path">Path</th>
+                                <th st-sort="TagName">Tag Name</th>
+                                <th st-sort="FriendlyName">Friendly Name</th>
+                                <th st-sort="Status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in previewFileResults">
+                                <td>{{row.LineNumber}}</td>
+                                <td>{{row.Path}}</td>
+                                <td>{{row.TagName}}</td>
+                                <td>{{row.FriendlyName}}</td>
+                                <td>{{row.Status}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="btn-group" style="float: right; margin-top: 20px; margin-bottom: 20px;">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            value="Submit"
+                            ng-click="saveImport()"
+                            ng-disabled="!importFileValid">
+                        Import
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-default"
+                            data-dismiss="modal"
+                            ng-click="closePreviewResultWindow()">
+                        Cancel
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</modal-dialoga>
